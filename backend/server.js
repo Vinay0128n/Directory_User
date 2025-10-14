@@ -6,13 +6,25 @@ require('dotenv').config();
 const app = express();
 const port = process.env.PORT || 5000;
 
+// followig is CORS config.
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://userdirect.netlify.app'
+];
+
 const corsOptions = {
-  origin: 'http://localhost:3000', 
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 };
 
-// following Middlewares used 
 app.use(cors(corsOptions));
 app.use(express.json());
 
@@ -46,7 +58,7 @@ if (process.env.DATABASE_URL) {
 
 const pool = mysql.createPool(dbConfig);
 
-// DB connection check heree
+
 pool.getConnection()
   .then(conn => {
     console.log('Connected to MySQL database successfully!');
@@ -58,7 +70,7 @@ pool.getConnection()
   });
 
 
-// Get all u
+//we are gettig all users here
 app.get('/api/users', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM users ORDER BY id ASC');
@@ -69,7 +81,7 @@ app.get('/api/users', async (req, res) => {
   }
 });
 
-// Get a single u
+//get user by id here
 app.get('/api/users/:id', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM users WHERE id = ?', [req.params.id]);
@@ -83,7 +95,7 @@ app.get('/api/users/:id', async (req, res) => {
   }
 });
 
-// Creating a new us
+//create a new user here
 app.post('/api/users', async (req, res) => {
   try {
     const { name, email, department } = req.body;
@@ -107,7 +119,7 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-// Updating a us
+//update user by id here
 app.put('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -137,7 +149,7 @@ app.put('/api/users/:id', async (req, res) => {
   }
 });
 
-// Delet a us
+//delte user by id here
 app.delete('/api/users/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -155,5 +167,5 @@ app.delete('/api/users/:id', async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`Server is running on port ${port}`);
 });
