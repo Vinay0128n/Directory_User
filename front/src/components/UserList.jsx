@@ -60,7 +60,7 @@ const UserList = ({ onAddNewUser }) => {
   const [error, setError] = useState('');
   const [editForm, setEditForm] = useState({ name: '', email: '', department: '' });
 
-  const [selectedUser, setSelectedUser] = useState(null); // ✅ for mobile selection
+  const [selectedUser, setSelectedUser] = useState(null); 
 
   const totalItems = allUsers.length;
   const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
@@ -280,10 +280,11 @@ const UserList = ({ onAddNewUser }) => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
+            //for selecting current user when clicked 
             {currentUsers.map((user) => (
               <tr
                 key={user.id}
-                onClick={() => setSelectedUser(user)} // ✅ select user on click
+                onClick={() => setSelectedUser(user)} 
                 className={`hover:bg-gray-50 cursor-pointer ${
                   selectedUser?.id === user.id ? 'bg-blue-50' : ''
                 }`}
@@ -298,7 +299,7 @@ const UserList = ({ onAddNewUser }) => {
                   <div className="text-sm text-gray-700">{user.department}</div>
                 </td>
 
-                {/* hide on mobile */}
+                
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4 hidden sm:table-cell">
                   <Link
                     to={`/user/${user.id}`}
