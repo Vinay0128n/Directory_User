@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 
-const API_URL = 'http://localhost:5000/api';
+const API_URL = 'https://directory-user-backend.onrender.com/api';
 const ITEMS_PER_PAGE = 5;
 
 const Modal = ({ isOpen, onClose, children, showCloseButton = true }) => {
