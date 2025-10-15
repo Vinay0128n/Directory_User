@@ -21,24 +21,64 @@ const AddUserForm = ({ onUserAdded, onCancel }) => {
     }));
   };
 
-  //for submitting the add user form
+//validation for email and name is following
+  const validateForm = (name, email, users) => {
+    
+    if (!/^[a-zA-Z\s]+$/.test(name)) {
+      return 'Name should contain only letters and spaces';
+    }
+    
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return 'Please enter a valid email address';
+    }
+    
+    const emailExists = users.some(user => 
+      user.email.toLowerCase() === email.toLowerCase()
+    );
+    
+    if (emailExists) {
+      return 'This email is already in use. Please use a different email.';
+    }
+    
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
-    setIsSubmitting(true);
-
+    
+    //here we are getting all users to check for duplicate email
     try {
-      await axios.post(`${API_URL}/users`, formData);
-      setSuccess('User added successfully!');
-      setFormData({ name: '', email: '', department: '' });
-      if (onUserAdded) {
-        await onUserAdded({ goToLastPage: true });
+      const response = await axios.get(`${API_URL}/users`);
+      const users = response.data.users || [];
+      
+      // Validate form data
+      const validationError = validateForm(formData.name, formData.email, users);
+      if (validationError) {
+        setError(validationError);
+        return;
       }
+      
+      setIsSubmitting(true);
+      
+      try {
+        await axios.post(`${API_URL}/users`, formData);
+        setSuccess('User added successfully!');
+        setFormData({ name: '', email: '', department: '' });
+        if (onUserAdded) {
+          await onUserAdded({ goToLastPage: true });
+        }
+      } catch (err) {
+        setError(err.response?.data?.error || 'Failed to add user. Please try again.');
+      } finally {
+        setIsSubmitting(false);
+      }
+      
     } catch (err) {
-      setError(err.response?.data?.error || 'Failed to add user. Please try again.');
-    } finally {
-      setIsSubmitting(false);
+      setError('Failed to validate user data. Please try again.');
+      console.error('Error fetching users for validation:', err);
     }
   };
 
